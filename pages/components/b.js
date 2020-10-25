@@ -13,7 +13,8 @@ export default function Page2({ navigation }) {
   useEffect(() => {
     const fetchData =  () => {
       const params = {
-        orderId: 'O2639845667664560131',
+        // *****  每半小时失效一次 开发调用接口 ********
+        orderId: 'O2640477576161656836',
         from: 'h5'
       }
       fetch(`${BASEURL}${PAYMENTS}`, {

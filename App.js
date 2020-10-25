@@ -6,6 +6,8 @@ import Button from './pages/components/Button';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Page from './pages/a';
+import Login from './pages/login/login';
+import Bankbanding from './pages/bankbanding/Bankbanding'
 
 function Home(props) {
   const { navigation } = props;
@@ -39,7 +41,7 @@ function Home(props) {
           setA('按钮按了一下我呀');
           navigation.navigate('page1')
         }} />
-      {/* <StatusBar style="auto" /> */}
+      <StatusBar style="auto" />
     </View>
   );
 }
@@ -98,10 +100,24 @@ export default function App() {
           }}
         />
         <Stack.Screen 
+        name="bankbanding" 
+        component={Bankbanding} 
+        options={{
+          title: '绑定银行卡'
+        }}
+        />
+        <Stack.Screen 
           name="page1" 
           component={Page} 
           options={{
             title: '页面2'
+          }}
+        />
+        <Stack.Screen 
+          name="login" 
+          component={Login} 
+          options={{
+            title: '登入/注册'
           }}
         />
       </Stack.Navigator>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Image, Button, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Image, Button, TouchableOpacity, SafeAreaView, FlatList } from 'react-native';
 import Account from './Account';
 import Cover from './Cover';
 
@@ -12,9 +12,9 @@ export default function Payment (props) {
   const [show, setShow] = useState(false);
   const merchantName = orderDetails ? orderDetails.merchantName : '';
   const onPress = (e) => {
-    setShow(!show)
+    // setShow(!show)
     // console.log(e)
-    // navigation.navigate('home')
+    navigation.navigate('login')
   }
   return (
     <View style={styles.paymentWrapper}>
@@ -31,7 +31,7 @@ export default function Payment (props) {
           <Text>{ merchantName }</Text>
         </View>
         <View style={styles.account}>
-          { payInfo.length > 1 && payInfo.map((item, index ) => {
+          {/* { payInfo.length > 1 && payInfo.map((item, index ) => {
             return (
               <Account 
                 uniKey = { item.cnt}
@@ -40,7 +40,15 @@ export default function Payment (props) {
                 dueDate = { item.dueDate }
               />
             )
-          })}
+          })} */}
+          {
+            payInfo.length > 1 &&   
+            <FlatList
+              data={payInfo}
+              renderItem={Account}
+              keyExtractor={item => item.dueDate}
+            />
+          }
         </View>
         <View style={styles.totalAmout}>
           <Text style={styles.color999}>订单金额</Text>

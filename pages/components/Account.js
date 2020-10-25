@@ -3,11 +3,12 @@ import { Text, View, StyleSheet, Button } from 'react-native';
 
 export default function Account (props) {
   const {
-    firstPay,
+    isFirstPay,
     payAmt,
     dueDate,
     uniKey
-  } = props;
+  } = props.item;
+  const firstPay = isFirstPay === 'Y';
   return (
     <View style={styles.acnWrapper} key={uniKey}>
       <View>
