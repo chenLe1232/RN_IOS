@@ -110,7 +110,7 @@ export default function App() {
           name="page1" 
           component={Page} 
           options={{
-            title: '页面2'
+            title: '待付款'
           }}
         />
         <Stack.Screen 

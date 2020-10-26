@@ -5,7 +5,7 @@ import { BASEURL } from '../../utils/CONSTS';
 import { PAYMENTS } from '../../utils/API';
 import Payment from './Payment';
 import cloneDeep from 'lodash/cloneDeep';
-// import {fetch} from '../../utils/fetch';
+import VerifyCode from '../bankbanding/Verify';
 
 export default function Page2({ navigation }) {
   const [orderDetails, SetOrder ] = useState('');
@@ -14,7 +14,7 @@ export default function Page2({ navigation }) {
     const fetchData =  () => {
       const params = {
         // *****  每半小时失效一次 开发调用接口 ********
-        orderId: 'O2640477576161656836',
+        orderId: 'O2641181164869517314',
         from: 'h5'
       }
       fetch(`${BASEURL}${PAYMENTS}`, {
@@ -32,18 +32,23 @@ export default function Page2({ navigation }) {
         SetOrder(res.data.detail)
       })
       .catch(err => {
-        console.log(err, 'from catch')
+        console.log(err, 'from b.js')
       })
     }
     fetchData()
-  }, [])
-
+  }, []);
+  const codeChange = (code) => {
+    console.log(code)
+  }
   return (
     <View>
-      <Payment 
+      {/* <Payment 
         orderDetails={orderDetails} 
         payInfo={payInfo}
         navigation = {navigation}
+      /> */}
+      <VerifyCode 
+        onChangeCode={codeChange}
       />
     </View>
   );

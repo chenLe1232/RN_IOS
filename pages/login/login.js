@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Text, View, StyleSheet,Image, Button, TextInput, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet,Image, Button, TextInput, TouchableOpacity, AsyncStorage } from 'react-native';
+import { BASEURL } from '../../utils/CONSTS';
+import { MOBILE_EXIST } from '../../utils/API';
 
 export default function Login (props) {
   const {
@@ -7,26 +9,84 @@ export default function Login (props) {
   } = props;
   const loginInput = useRef(null);
   const [ value, setValue ] = useState('');
-  const [show, setShow ] = useState(false);
+  const [ userInfo, setUserInfo ] = useState({
+    phoneExit: false,
+    token: ''
+  });
+  const [show, setShow ] = useState({
+    errText: false,
+    ableConfirm: false,
+  });
   const onChangeText = (text) => {
     const value = text.replace(/\D+/g, '');
+    const reg = /^1[3456789]\d{9}$/;
+    if ( value.length === 11) {
+      const phoneStatus = reg.test(value);
+      setShow({
+        ableConfirm: phoneStatus,
+        errText: !phoneStatus
+      });
+    } else {
+      setShow({
+        ableConfirm: false,
+        errText: false
+      })
+    }
     setValue(value);
   }
   const onPress = () => {
-    if ( value.length === 11) {
-      navigation.navigate('bankbanding', {
-        loginTel: value
+    if ( show.ableConfirm ) {
+      // 判断用户是否已注册
+      const phoneExitsUrl = BASEURL + MOBILE_EXIST;
+      fetch(phoneExitsUrl, {
+        method: 'POST',
+        body: JSON.stringify({
+          mobile: Number(value)
+        })
       })
+        .then(res => res.json())
+        .then( res => {
+          if ( res.code === 200) {
+            const { exist, token } = res.data;
+            if ( exist ) {
+              // 用户已存在, 打开发送验证码组件
+              setUserInfo({
+                ...userInfo,
+                phoneExit: exist
+              })
+            } else {
+              // 跳转到绑定银行卡页面 并且把当前获取的token存入 storage里面; 每次都保存最新的token信息
+              AsyncStorage.setItem('AUTH_TOKEN', token, error => {
+                 if ( !error) {
+                  //  如果正常存储 然后跳转到绑卡界面
+                  navigation.navigate('bankbanding', {
+                    loginTel: value
+                  });
+                 };
+              });
+            }
+          }
+        })
+        .catch( error => {
+          console.log(error, 'from login.js')
+        });
     }
   }
   const handleBlur = (e) => {
     const reg = /^1[3456789]\d{9}$/;
     const flag = reg.test(value);
-    if (flag){
-      setShow(false);
+    // 失焦 如果手机号输入正确
+    if ( flag) {
+      setShow({
+        errText: false,
+        ableConfirm: true,
+      })
     } else {
-      setShow(true)
-    }
+      setShow({
+        errText: true,
+        ableConfirm: false
+      })
+    };
   }
   useEffect(() => {
     loginInput.current.focus();
@@ -48,10 +108,10 @@ export default function Login (props) {
          placeholderTextColor="#999999"
          onBlur={handleBlur}
       />
-      { show && <Text>您输入的手机号不正确</Text>}
+      { show.errText && <Text>您输入的手机号不正确</Text>}
       {/* 按钮 */}
       <TouchableOpacity
-        style={styles.button}
+        style={[styles.button, show.ableConfirm && styles.ableConfirmBtn]}
         onPress={onPress}
       >
         <Text style={styles.btnText}>
@@ -66,10 +126,13 @@ const styles = StyleSheet.create({
     width: 335,
     height: 47,
     borderRadius: 8,
-    backgroundColor: '#FF5861',
+    backgroundColor: '#E0E0E0',
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 30,
+  },
+  ableConfirmBtn: {
+    backgroundColor: '#FF5861',
   },
   btnText: {
     color: '#FFFFFF',

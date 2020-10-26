@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Image, Button, TouchableOpacity, SafeAreaView, FlatList } from 'react-native';
+import { StyleSheet, Text, View, Image, Button, TouchableOpacity, SafeAreaView, FlatList, AsyncStorage } from 'react-native';
 import Account from './Account';
 import Cover from './Cover';
-
+import { BASEURL } from '../../utils/CONSTS';
+import { PAYMENTS } from '../../utils/API';
+ 
 export default function Payment (props) {
   const {
     orderDetails,
@@ -10,12 +12,34 @@ export default function Payment (props) {
     navigation
   } = props;
   const [show, setShow] = useState(false);
+  const [token, setToken ] = useState(null);
   const merchantName = orderDetails ? orderDetails.merchantName : '';
-  const onPress = (e) => {
-    // setShow(!show)
-    // console.log(e)
-    navigation.navigate('login')
+  const _getAuthToken = async () => {
+    try {
+      const AuthToken = await AsyncStorage.getItem('AUTH_TOKEN').then(res => {
+        // console.log(res)
+        if (res !== null) {
+          setToken(res);
+        }
+      });
+     
+    } catch (error) {
+      console.log(error)
+    }
   }
+  const onPress = (e) => {
+
+    // setShow(!show)
+    // 判断用户是否存有token
+    if (token) {
+
+    } else {
+      navigation.navigate('login');
+    }
+  }
+  useEffect(() => {
+    _getAuthToken();
+  }, [])
   return (
     <View style={styles.paymentWrapper}>
       {/* 测试 cover */}
